@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Plus, Newspaper, Building2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,8 +28,6 @@ const supabase = createClient(
   "https://wlbyylcjyaflboanixwr.supabase.co",
   process.env.NEXT_PUBLIC_SUPABASE_KEY!
 );
-
-const brandBlue = "##0D3B5D";
 
 type PropertyType = "sale" | "rent" | "wanted";
 
@@ -147,39 +146,108 @@ export default function AdminPanel() {
     setNewsForm({ title: "", content: "", image: "" });
   };
 
+  const [loggedIn, setLoggedIn] = useState(true); // يبدأ مسجل دخول، يمكن تغيير القيمة للعرض
+
+if (!loggedIn) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <Card className="p-6 space-y-4 w-80">
+        <CardHeader>
+          <CardTitle>تسجيل الدخول</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input type="text" placeholder="اسم المستخدم" />
+          <Input type="password" placeholder="كلمة المرور" />
+          <Button
+            className="w-full bg-[${brandBlue}] text-white hover:bg-[${brandBlue}]"
+            onClick={() => setLoggedIn(true)}
+          >
+            دخول
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+const [oldPassword, setOldPassword] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
+
+const [showOld, setShowOld] = useState(false);
+const [showNew, setShowNew] = useState(false);
+const [showConfirm, setShowConfirm] = useState(false);
+
+const handlePasswordChange = () => {
+  if (newPassword.length < 6) {
+    toast.error("كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف");
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    toast.error("تأكيد كلمة المرور غير مطابق");
+    return;
+  }
+  if (!oldPassword) {
+    toast.error("يرجى إدخال كلمة المرور الحالية");
+    return;
+  }
+
+  // هنا يمكنك ربط التحديث بحساب Supabase أو API خارجي حسب طبيعة المشروع
+  toast.success("تم تحديث كلمة المرور بنجاح");
+  
+  setOldPassword("");
+  setNewPassword("");
+  setConfirmPassword("");
+};
+
+
   return (
     <div className="min-h-screen bg-gray-50 flex text-right text-[${brandBlue}]">
       <ToastContainer position="top-center" rtl autoClose={3000} />
       <div className="w-64 bg-white border-l p-6 space-y-4">
         <Button
-          variant={tab === "properties" ? "default" : "outline"}
-          onClick={() => setTab("properties")}
-          className="w-full border border-[${brandBlue}] text-[${brandBlue}] hover:bg-[${brandBlue}"
-        >
-          {" "}
-          جميع العقارات
-        </Button>
-        <Button
-          variant={tab === "add-property" ? "default" : "outline"}
-          onClick={() => setTab("add-property")}
-          className="w-full border border-[${brandBlue}] text-[${brandBlue}] hover:bg-[${brandBlue}]"
-        >
-          إضافة عقار
-        </Button>
-        <Button
-          variant={tab === "news" ? "default" : "outline"}
-          onClick={() => setTab("news")}
-          className="w-full border border-[${brandBlue}] text-[${brandBlue}] hover:bg-[${brandBlue}"
-        >
-          جميع الأخبار
-        </Button>
-        <Button
-          variant={tab === "add-news" ? "default" : "outline"}
-          onClick={() => setTab("add-news")}
-          className="w-full border border-[${brandBlue}] text-[${brandBlue}] hover:bg-[${brandBlue}]"
-        >
-          إضافة خبر
-        </Button>
+  variant={tab === "properties" ? "default" : "outline"}
+  onClick={() => setTab("properties")}
+  className="w-full"
+>
+  جميع العقارات
+</Button>
+<Button
+  variant={tab === "add-property" ? "default" : "outline"}
+  onClick={() => setTab("add-property")}
+  className="w-full"
+>
+  إضافة عقار
+</Button>
+<Button
+  variant={tab === "news" ? "default" : "outline"}
+  onClick={() => setTab("news")}
+  className="w-full"
+>
+  جميع الأخبار
+</Button>
+<Button
+  variant={tab === "add-news" ? "default" : "outline"}
+  onClick={() => setTab("add-news")}
+  className="w-full"
+>
+  إضافة خبر
+</Button>
+<Button
+  variant={tab === "settings" ? "default" : "outline"}
+  onClick={() => setTab("settings")}
+  className="w-full"
+>
+  الإعدادات
+</Button>
+<Button
+  variant={tab === "logout" ? "default" : "outline"}
+  onClick={() => setTab("logout")}
+  className="w-full"
+>
+  تسجيل الخروج
+</Button>
+
       </div>
 
       <div className="flex-1 p-6 space-y-6">
@@ -380,7 +448,7 @@ export default function AdminPanel() {
                 <div className="md:col-span-2">
                   <Button
                     type="submit"
-                    className="bg-[${brandBlue}] hover:bg-[${brandBlue}] text-white"
+                    className="text-white" variant="default"
                   >
                     إضافة العقار
                   </Button>
@@ -454,11 +522,108 @@ export default function AdminPanel() {
                 </div>
                 <Button
                   type="submit"
-                  className="bg-[${brandBlue}] hover:bg-[${brandBlue}] text-white"
+                  className="text-white" variant="default"
                 >
                   إضافة الخبر
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === "settings" && (
+  <Card>
+    <CardHeader>
+      <CardTitle>إعدادات الحساب</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-4 max-w-md">
+        <div>
+          <Label>كلمة المرور الحالية</Label>
+          <div className="relative">
+            <Input
+              type={showOld ? "text" : "password"}
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              required
+            />
+            <span
+              className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer"
+              onClick={() => setShowOld(!showOld)}
+            >
+              {showOld ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <Label>كلمة المرور الجديدة</Label>
+          <div className="relative">
+            <Input
+              type={showNew ? "text" : "password"}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+            <span
+              className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer"
+              onClick={() => setShowNew(!showNew)}
+            >
+              {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <Label>تأكيد كلمة المرور</Label>
+          <div className="relative">
+            <Input
+              type={showConfirm ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <span
+              className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer"
+              onClick={() => setShowConfirm(!showConfirm)}
+            >
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          className="text-white" variant="default"
+          onClick={handlePasswordChange}
+        >
+          تحديث كلمة المرور
+        </Button>
+      </form>
+    </CardContent>
+  </Card>
+)}
+
+
+        {tab === "logout" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>تأكيد تسجيل الخروج</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
+              <div className="flex gap-4">
+                <Button
+                  className="bg-red-600 text-white hover:bg-red-700"
+                  onClick={() => setLoggedIn(false)}
+                >
+                  نعم، تسجيل الخروج
+                </Button>
+                <Button variant="outline" onClick={() => setTab("properties")}>
+                  إلغاء
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
