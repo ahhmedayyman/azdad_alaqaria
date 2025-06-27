@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "JF-Flat";
+  src: url("/fonts/JF-Flat-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "JF-Flat";
+  src: url("/fonts/JF-Flat-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "JF-Flat";
+  src: url("/fonts/JF-Flat-light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+* {
+  font-family: "JF-Flat", Arial, sans-serif;
+}
+
+body {
+  font-family: "JF-Flat", Arial, sans-serif;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+
+
